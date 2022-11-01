@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
+import { serialize } from "cookie";
 
 export default async function handler(
 	req: NextApiRequest,
@@ -22,9 +23,15 @@ export default async function handler(
 			},
 		}
 	);
-
-	// console.log("in refresh.ts", response.data);
+	res.setHeader(
+		"Set-Cookie",
+		serialize("access_token", response.data.access, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV !== "development",
+			sameSite: "strict",
+			maxAge: 60 * 60 * 60 * 5,
+			path: "/",
+		})
+	);
 	res.status(200).json(response.data);
-
-	// console.log(response.data);
 }

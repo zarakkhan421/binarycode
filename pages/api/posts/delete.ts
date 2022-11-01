@@ -28,6 +28,6 @@ export default async function handler(
 	} catch (error) {
 		console.log("fdvtr");
 
-		res.status(300).json({ success: false });
+		res.status(200).json({ success: false });
 	}
 }
