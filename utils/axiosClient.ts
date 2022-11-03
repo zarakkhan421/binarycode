@@ -1,9 +1,12 @@
 import axios from "axios";
 import jwtDecode, { JwtPayload } from "jwt-decode";
-const axiosServer = (req: any) => {
-	let access = req.cookies.access_token;
-	let refresh = req.cookies.refresh_token;
-	const axiosApi = axios.create({
+import { userContext } from "../pages/_app";
+import { useContext } from "react";
+const useAxiosClient = () => {
+	let { user } = useContext(userContext);
+	let access = user.access;
+	let refresh = user.refresh;
+	const axiosClient = axios.create({
 		baseURL: "http://127.0.0.1:8000/",
 		withCredentials: true,
 		headers: {
@@ -13,8 +16,9 @@ const axiosServer = (req: any) => {
 		},
 	});
 
-	axiosApi.interceptors.request.use(async (req: any) => {
+	axiosClient.interceptors.request.use(async (req: any) => {
 		console.log(access);
+
 		const decodedAccessToken: any = jwtDecode<JwtPayload>(access);
 		const expireTime = decodedAccessToken.exp * 1000;
 		const date = Date.now();
@@ -38,7 +42,7 @@ const axiosServer = (req: any) => {
 		}
 		return req;
 	});
-	return axiosApi;
+	return axiosClient;
 };
 
-export default axiosServer;
+export default useAxiosClient;

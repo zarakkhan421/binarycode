@@ -9,21 +9,27 @@ import {
 } from "react";
 import axios from "axios";
 import Link from "next/link";
+import Navbar from "../components/Navbar";
 interface User {
 	email: string;
 	role: string;
 	access: string;
+	refresh: string;
 }
 export const userContext = createContext<{
 	user: User;
 	setUser: (user: User) => void;
-}>({ user: { email: "", role: "", access: "" }, setUser: () => {} });
+}>({
+	user: { email: "", role: "", access: "", refresh: "" },
+	setUser: () => {},
+});
 
 export default function App({ Component, pageProps }: AppProps) {
 	const [user, setUser] = useState({
 		email: "",
 		role: "",
 		access: "",
+		refresh: "",
 	});
 
 	useEffect(() => {
@@ -42,21 +48,19 @@ export default function App({ Component, pageProps }: AppProps) {
 				}
 			);
 			console.log("sfvrb5");
+			console.log(response.data);
 			setUser({
 				email: response.data.email,
 				role: response.data.role,
 				access: response.data.access,
+				refresh: response.data.refresh,
 			});
-			console.log(response.data);
 		};
 		getToken();
 	}, []);
 	return (
 		<userContext.Provider value={{ user, setUser }}>
-			<div>
-				<Link href={"/"}>Home</Link>
-				<Link href={"/dashboard"}>Dashboard</Link>
-			</div>
+			<Navbar />
 			<Component {...pageProps} />
 		</userContext.Provider>
 	);

@@ -33,6 +33,7 @@ const SignUp: NextPage = () => {
 				email: user.data.user.email,
 				role: user.data.user.role,
 				access: user.data.user.access,
+				refresh: user.data.user.refresh,
 			});
 			Router.push("/dashboard");
 		} catch (error) {
