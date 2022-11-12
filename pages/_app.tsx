@@ -119,31 +119,30 @@ export default function MyApp(props: MyAppProps) {
 		user_id: "",
 	});
 
+	const getToken = async () => {
+		console.log("loaded");
+		const response = await axios.post(
+			"http://localhost:3000/api/refresh/",
+			{},
+			{
+				withCredentials: true,
+				headers: {
+					Accept: "application/json",
+					"Content-Type": "application/json",
+				},
+			}
+		);
+		console.log("sfvrb5");
+		console.log(response.data);
+		setUser({
+			email: response.data.email,
+			role: response.data.role,
+			access: response.data.access,
+			refresh: response.data.refresh,
+			user_id: response.data.user_id,
+		});
+	};
 	useEffect(() => {
-		const getToken = async () => {
-			console.log("loaded");
-
-			const response = await axios.post(
-				"http://localhost:3000/api/refresh/",
-				{},
-				{
-					withCredentials: true,
-					headers: {
-						Accept: "application/json",
-						"Content-Type": "application/json",
-					},
-				}
-			);
-			console.log("sfvrb5");
-			console.log(response.data);
-			setUser({
-				email: response.data.email,
-				role: response.data.role,
-				access: response.data.access,
-				refresh: response.data.refresh,
-				user_id: response.data.user_id,
-			});
-		};
 		getToken();
 	}, []);
 	return (

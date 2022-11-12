@@ -4,7 +4,10 @@ import { userContext } from "../pages/_app";
 import { useContext } from "react";
 const useAxiosClient = () => {
 	let { user } = useContext(userContext);
-	let access = user.access;
+	// an expired token is provided so that there is somethong to decode in case of refresh
+	let access =
+		user.access ||
+		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjY4MzI2NDY1LCJpYXQiOjE2NjgyMzM5MjAsImp0aSI6IjA4YmUwZTk4Y2MxZTQxOTA4NjcxZDU3YTgyNmM1MWRiIiwidXNlcl9pZCI6ImNiNGZiMjRkLTAwZWYtNDg3Yy04YjM5LTQ4OWJkMjVjY2M5ZSJ9.7yF2f1reb4pPubR5Jwy8bGLkLhUc_TE7IKZJattojE4";
 	let refresh = user.refresh;
 	const axiosClient = axios.create({
 		baseURL: "http://127.0.0.1:8000/",
@@ -17,7 +20,7 @@ const useAxiosClient = () => {
 	});
 
 	axiosClient.interceptors.request.use(async (req: any) => {
-		console.log(access);
+		console.log("dssd", access.length);
 
 		const decodedAccessToken: any = jwtDecode<JwtPayload>(access);
 		const expireTime = decodedAccessToken.exp * 1000;

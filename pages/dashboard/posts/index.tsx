@@ -4,7 +4,7 @@ import Link from "next/link";
 import Dashboard from "../../../components/Dashboard";
 import { useState, useEffect, useMemo, useId } from "react";
 import useAxiosClient from "../../../utils/axiosClient";
-import { useTable, TableOptions, Column } from "react-table";
+import { useTable, TableOptions, Column, Cell } from "react-table";
 const Posts: NextPage = () => {
 	const [posts, setPosts] = useState([]);
 	const axiosClient = useAxiosClient();
@@ -17,17 +17,83 @@ const Posts: NextPage = () => {
 	useEffect(() => {
 		getPosts();
 	}, []);
-	type Cols = { title: string; status: string };
+	interface Cols {
+		title: string;
+		status: string;
+		author: string;
+	}
 
 	const data = useMemo((): Cols[] => posts, [posts]);
-	const columns: Column<{ title: string; status: string }>[] = useMemo(
+	const columns = useMemo(
 		() => [
 			{ Header: "Title", accessor: "title" },
-			{ Header: "Status", accessor: "status" },
+			{
+				Header: "Status",
+				accessor: "status",
+			},
+			{
+				Header: "Author",
+				accessor: "user_id.email",
+			},
+			{
+				Header: "Comments",
+				accessor: "comment_count",
+			},
+			{
+				Header: "Views",
+				accessor: "views",
+			},
+			{
+				Header: "Action",
+				accessor: "uid",
+				width: 200,
+				Cell: (cell: any) => (
+					<div>
+						<Button
+							LinkComponent={Link}
+							size="small"
+							sx={{
+								textTransform: "none",
+							}}
+							variant="contained"
+							href={`http://localhost:3000/posts/${cell.cell.value}`}
+						>
+							Visit
+						</Button>
+						<Button
+							LinkComponent={Link}
+							size="small"
+							sx={{
+								textTransform: "none",
+							}}
+							variant="contained"
+							href={`http://localhost:3000/dashboard/posts/edit/${cell.cell.value}`}
+						>
+							Edit
+						</Button>
+						<Button
+							LinkComponent={Link}
+							size="small"
+							sx={{
+								textTransform: "none",
+								background: "red",
+								"&:hover": {
+									background: "red",
+									opacity: 0.7,
+								},
+							}}
+							variant="contained"
+							href={`http://localhost:3000/posts/${cell.cell.value}`}
+						>
+							Delete
+						</Button>
+					</div>
+				),
+			},
 		],
 		[]
 	);
-	const options: TableOptions<{ title: string; status: string }> = {
+	const options: any = {
 		data,
 		columns,
 	};
@@ -52,6 +118,7 @@ const Posts: NextPage = () => {
 							// Loop over the header rows
 							headerGroups.map((headerGroup: any) => (
 								// Apply the header row props
+
 								<tr key={id} {...headerGroup.getHeaderGroupProps()}>
 									{
 										// Loop over the headers in each row
