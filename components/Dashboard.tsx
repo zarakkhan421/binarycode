@@ -1,14 +1,15 @@
 import { GetServerSideProps, NextPage } from "next";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, FC } from "react";
 import axios, { AxiosResponse } from "axios";
-import { userContext } from "../_app";
+import { userContext } from "../pages/_app";
 import Link from "next/link";
 import jwtDecode, { JwtPayload } from "jwt-decode";
-import baseAxios from "../../utils/axiosServer";
-import axiosServer from "../../utils/axiosServer";
-import useAxiosClient from "../../utils/axiosClient";
+import baseAxios from "../utils/axiosServer";
+import axiosServer from "../utils/axiosServer";
+import useAxiosClient from "../utils/axiosClient";
 import Drawer from "@mui/material/Drawer";
 import Toolbar from "@mui/material/Toolbar";
+
 import {
 	Divider,
 	List,
@@ -16,13 +17,14 @@ import {
 	ListItemButton,
 	ListItemIcon,
 	ListItemText,
+	Stack,
 	Table,
 	TableBody,
 	TableCell,
 	TableRow,
+	Tabs,
 } from "@mui/material";
-import Dashboard from "../../components/Dashboard";
-import { Box } from "@mui/system";
+import { Box } from "@mui/material";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
 interface Post {
@@ -38,45 +40,53 @@ interface Category {
 	uid: string;
 	name: string;
 }
+type Props = {
+	children: React.ReactNode;
+};
 
-const Home: NextPage<{ posts: Post[] }> = (postsData) => {
-	const { user } = useContext(userContext);
-	const [posts, setPosts] = useState(postsData.posts);
-	const axiosClient = useAxiosClient();
-	// console.log("sdcsfvtet", postsData);
+const Home = (props: React.PropsWithChildren) => {
+	// const { user } = useContext(userContext);
+	// const [posts, setPosts] = useState(postsData.posts);
+	// const axiosClient = useAxiosClient();
+	// // console.log("sdcsfvtet", postsData);
 
-	const deletePostHandler = async (e: any) => {
-		e.preventDefault();
-		console.log(e.target.post_uid.value);
-		const response = await axiosClient.delete(
-			`http://127.0.0.1:8000/posts/${e.target.post_uid.value}`
-		);
-		try {
-			setPosts(
-				posts.filter((post: any) => post.uid !== e.target.post_uid.value)
-			);
-			// console.log(response);
-		} catch (error) {
-			console.log("failed delete");
+	// const deletePostHandler = async (e: any) => {
+	// 	e.preventDefault();
+	// 	console.log(e.target.post_uid.value);
+	// 	const response = await axiosClient.delete(
+	// 		`http://127.0.0.1:8000/posts/${e.target.post_uid.value}`
+	// 	);
+	// 	try {
+	// 		setPosts(
+	// 			posts.filter((post: any) => post.uid !== e.target.post_uid.value)
+	// 		);
+	// 		// console.log(response);
+	// 	} catch (error) {
+	// 		console.log("failed delete");
 
-			console.log(error);
-		}
-	};
+	// 		console.log(error);
+	// 	}
+	// };
 
 	return (
 		<div>
-			{/* <Table>
+			<Table>
 				<TableBody>
 					<TableRow>
 						<TableCell sx={{ width: "200px", borderBottom: "0" }}>
-							menu
+							<Box>
+								<Box>
+									<Link href="/dashboard/posts/">Posts</Link>
+								</Box>
+								<Box>
+									<Link href="/dashboard/categories/">Categories</Link>
+								</Box>
+							</Box>
 						</TableCell>
-						<TableCell>{}</TableCell>
+						<TableCell>{props.children}</TableCell>
 					</TableRow>
 				</TableBody>
-			</Table> */}
-
-			<Dashboard>dashboard</Dashboard>
+			</Table>
 			{/* {posts !== undefined &&
 				posts.map((post: any) => {
 					return (

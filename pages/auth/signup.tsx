@@ -1,66 +1,61 @@
 import { NextPage } from "next";
-import { useState, SyntheticEvent } from "react";
-import Router from "next/router";
-import axios from "axios";
-import { useContext } from "react";
-import { userContext } from "../_app";
-import Link from "next/link";
+import { Typography, useTheme } from "@mui/material";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { TextField } from "formik-mui";
-import { Box, Button, Grid, Typography, useTheme } from "@mui/material";
-import useAxiosClient from "../../utils/axiosClient";
+import Button from "@mui/material/Button";
+import Link from "next/link";
+import Grid from "@mui/material/Grid";
+import axios from "axios";
+import { userContext } from "../_app";
+import { useContext } from "react";
 
-const Login: NextPage = () => {
-	const { setUser } = useContext(userContext);
+const Signup: NextPage = () => {
 	const theme = useTheme();
+	const { setUser } = useContext(userContext);
 
 	return (
 		<div>
 			<Formik
-				initialValues={{ email: "", password: "" }}
+				initialValues={{ email: "", password: "", password2: "" }}
 				validationSchema={Yup.object({
 					email: Yup.string()
-						.email("invalid email")
+						.email("not valid email")
 						.required("email is required"),
-					password: Yup.string().min(8, "minimum characters should be 8"),
+					password: Yup.string()
+						.min(8, "minimum 8 charaters requied")
+						.required("password is required"),
+					password2: Yup.string()
+						.oneOf([Yup.ref("password"), null], "passwords do not match")
+						.required("confirm password is required"),
 				})}
 				onSubmit={async (values, { setSubmitting }) => {
 					console.log(values);
-					const user = await axios.post(
-						`http://localhost:3000/api/login/`,
-						{ email: values.email, password: values.password }
-						// {
-						// 	withCredentials: true,
-						// 	headers: {
-						// 		Accept: "application/json",
-						// 		"Content-Type": "application/json",
-						// 	},
-						// }
-					);
-
+					const user = await axios.post(`http://localhost:3000/api/signup/`, {
+						email: values.email,
+						password: values.password,
+						password2: values.password2,
+					});
+					console.log(user.data.user);
 					setUser({
 						email: user.data.user.email,
 						role: user.data.user.role,
 						access: user.data.user.token.access,
 						refresh: user.data.user.token.refresh,
-						user_id: user.data.user.user_id,
 					});
-					console.log(user);
-
 					setSubmitting(false);
 				}}
 			>
 				<Form style={{ marginTop: "12px" }}>
-					<Typography variant="h4">Login</Typography>
+					<Typography variant="h4">Sign Up</Typography>
 					<Grid
 						container
 						justifyContent="center"
 						alignItems="center"
-						width={"800px"}
+						width={"100%"}
 						height={"400px"}
 					>
-						<Grid item xs={6}>
+						<Grid item xs={12}>
 							<Field
 								label="Email"
 								component={TextField}
@@ -70,19 +65,26 @@ const Login: NextPage = () => {
 								sx={{ width: "300px" }}
 							/>
 						</Grid>
-						{/* <ErrorMessage name="email" /> */}
-						{/* <label htmlFor="password">Password</label> */}
 						<Grid item xs={6}>
 							<Field
-								label={"Password"}
+								label="Password"
 								component={TextField}
-								variant="outlined"
 								name="password"
 								type="password"
+								variant="outlined"
 								sx={{ width: "300px" }}
 							/>
 						</Grid>
-						{/* <ErrorMessage name="password" /> */}
+						<Grid item xs={6}>
+							<Field
+								label="Confirm Password"
+								component={TextField}
+								name="password2"
+								type="password"
+								variant="outlined"
+								sx={{ width: "300px" }}
+							/>
+						</Grid>
 						<Grid item xs={12}>
 							<Button
 								variant="contained"
@@ -91,16 +93,15 @@ const Login: NextPage = () => {
 								sx={{ width: "125px" }}
 								disableRipple
 							>
-								Login
+								Sign Up
 							</Button>
-
 							<Typography sx={{ marginTop: "10px" }}>
-								if you do not have an account registered you can{" "}
+								if you have an account{" "}
 								<Link
-									href={"/auth/signup/"}
+									href={"/auth/login/"}
 									style={{ color: theme.palette.primary.main }}
 								>
-									signup here.
+									login here.
 								</Link>
 							</Typography>
 						</Grid>
@@ -111,9 +112,4 @@ const Login: NextPage = () => {
 	);
 };
 
-const getServerSideProps = () => {
-	return {
-		props: {},
-	};
-};
-export default Login;
+export default Signup;
