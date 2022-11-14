@@ -9,22 +9,24 @@ import React, { useContext, useEffect, useState } from "react";
 import { userContext } from "../../_app";
 import axios from "axios";
 
-const Categories = ({ category, categoryChildren }: any) => {
+const Categories = ({ category, categoryChildren, i }: any) => {
 	let children = null;
+	i++;
 	children = categoryChildren.map((child: any) => {
 		return (
-			<Categories
-				key={child.uid}
-				category={child}
-				categoryChildren={child.children}
-			/>
+			<>
+				<Categories
+					key={child.uid}
+					category={child}
+					categoryChildren={child.children}
+					i={i}
+				/>
+			</>
 		);
 	});
 
 	return (
 		<ul style={{ listStyle: "none", paddingInlineStart: 20 }}>
-			{/* <li>{category.name}</li>
-			{children ? children : null} */}
 			<label>
 				<Field
 					component={Checkbox}
@@ -35,7 +37,7 @@ const Categories = ({ category, categoryChildren }: any) => {
 					}}
 					value={`${category.uid}`}
 				/>
-				{category.name}
+				{i + " " + category.name}
 				{children ? children : null}
 			</label>
 		</ul>
@@ -115,13 +117,19 @@ const Create: NextPage = () => {
 						<Grid item xs={4}>
 							<Grid container>
 								<Grid item xs={12} sx={{ height: 200, overflowY: "scroll" }}>
-									{categories.map((category: any) => (
-										<Categories
-											key={category.uid}
-											category={category}
-											categoryChildren={category.children}
-										/>
-									))}
+									{categories.map((category: any) => {
+										let i = 0;
+										return (
+											<>
+												<Categories
+													key={category.uid}
+													category={category}
+													categoryChildren={category.children}
+													i={i}
+												/>
+											</>
+										);
+									})}
 								</Grid>
 								<Grid item xs={12}>
 									<Field

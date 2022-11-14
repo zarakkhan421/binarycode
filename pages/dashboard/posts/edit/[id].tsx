@@ -23,26 +23,25 @@ const Categories = ({ category, categoryChildren, post }: any) => {
 			/>
 		);
 	});
-	console.log("post selected cats", post?.category_id);
-	console.log("category", category);
-	let selected = post?.category_id.map(
-		(selectedCategory: any) => selectedCategory.uid
-	);
-	console.log("selected", selected);
+	// console.log("post selected cats", post?.category_id);
+	// console.log("category", category);
+	// let selected = post?.category_id.map(
+	// 	(selectedCategory: any) => selectedCategory.uid
+	// );
+	// console.log("selected", selected);
 
-	checkedCat = selected.includes(category.uid);
-	console.log("checked", checkedCat);
+	// checkedCat = selected.includes(category.uid);
+	// console.log("checked", checkedCat);
 
 	return (
 		<ul style={{ listStyle: "none", paddingInlineStart: 20 }}>
-			{/* <li>{category.name}</li>
-			{children ? children : null} */}
 			<label>
 				<Field
-					component={Checkbox}
+					// component={Checkbox}
+
 					type="checkbox"
 					name="categories"
-					checked={checkedCat}
+					// checked={checkedCat}
 					sx={{
 						padding: 0.5,
 					}}
@@ -55,7 +54,7 @@ const Categories = ({ category, categoryChildren, post }: any) => {
 	);
 };
 
-const EditPage: NextPage = () => {
+const EditPost: NextPage = () => {
 	const { user } = useContext(userContext);
 	const [categories, setCategories] = useState<any>([]);
 
@@ -67,6 +66,7 @@ const EditPage: NextPage = () => {
 	const getPost = async () => {
 		const response = await axiosClient.get(`http://127.0.0.1:8000/posts/${id}`);
 		setPost(response.data);
+		console.log("edit post", post);
 	};
 	const getCategories = async () => {
 		const response = await axios.get(`http://127.0.0.1:8000/categories/`);
@@ -89,7 +89,7 @@ const EditPage: NextPage = () => {
 						content: post.content,
 						status: post.status,
 						excerpt: post.excerpt,
-						categories: post.category_id,
+						categories: post?.category_id?.map((cat: any) => cat.uid),
 					}}
 					validationSchema={Yup.object({
 						title: Yup.string().required("please enter a title"),
@@ -112,6 +112,7 @@ const EditPage: NextPage = () => {
 								category_id: values.categories,
 							}
 						);
+						console.log(post.data);
 
 						setSubmitting(false);
 					}}
@@ -126,6 +127,7 @@ const EditPage: NextPage = () => {
 											label="Title"
 											name="title"
 											type="text"
+											InputLabelProps={{ shrink: post.title }}
 										/>
 									</Grid>
 									<Grid item xs={12}>
@@ -134,6 +136,7 @@ const EditPage: NextPage = () => {
 											label="Content"
 											name="content"
 											type="text"
+											InputLabelProps={{ shrink: post.content }}
 										/>
 									</Grid>
 								</Grid>
@@ -157,6 +160,7 @@ const EditPage: NextPage = () => {
 											label="Choose Status"
 											as={"select"}
 											sx={{ width: 200 }}
+											InputLabelProps={{ shrink: post.status }}
 										>
 											{/* <MenuItem value="published">Published</MenuItem>
 											<MenuItem value="draft">Draft</MenuItem>
@@ -173,6 +177,7 @@ const EditPage: NextPage = () => {
 											label="Excerpt"
 											name="excerpt"
 											type="text"
+											InputLabelProps={{ shrink: post.excerpt }}
 										/>
 									</Grid>
 									<Grid item xs={12}>
@@ -191,4 +196,4 @@ const EditPage: NextPage = () => {
 	);
 };
 
-export default EditPage;
+export default EditPost;

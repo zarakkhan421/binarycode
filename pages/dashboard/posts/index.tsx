@@ -17,6 +17,7 @@ const Posts: NextPage = () => {
 	useEffect(() => {
 		getPosts();
 	}, []);
+
 	interface Cols {
 		title: string;
 		status: string;
@@ -33,7 +34,18 @@ const Posts: NextPage = () => {
 			},
 			{
 				Header: "Author",
-				accessor: "user_id.email",
+				accessor: "user_id",
+				Cell: (cell: any) => {
+					if (!cell.cell.value.name || cell.cell.value.name === " ") {
+						return <>{cell.cell.value.email}</>;
+					} else {
+						return <>{cell.cell.value.name}</>;
+					}
+				},
+			},
+			{
+				Header: "Role",
+				accessor: "user_id.role",
 			},
 			{
 				Header: "Comments",
@@ -83,7 +95,16 @@ const Posts: NextPage = () => {
 								},
 							}}
 							variant="contained"
-							href={`http://localhost:3000/posts/${cell.cell.value}`}
+							onClick={async (e) => {
+								console.log(e, cell.cell.value);
+								const response = await axiosClient.delete(
+									`http://127.0.0.1:8000/posts/${cell.cell.value}`
+								);
+								console.log(response);
+								setPosts(
+									posts.filter((post: any) => post.uid !== cell.cell.value)
+								);
+							}}
 						>
 							Delete
 						</Button>
@@ -91,7 +112,7 @@ const Posts: NextPage = () => {
 				),
 			},
 		],
-		[]
+		[posts]
 	);
 	const options: any = {
 		data,

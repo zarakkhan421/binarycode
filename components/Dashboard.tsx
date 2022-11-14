@@ -11,6 +11,7 @@ import Drawer from "@mui/material/Drawer";
 import Toolbar from "@mui/material/Toolbar";
 
 import {
+	Button,
 	Divider,
 	List,
 	ListItem,
@@ -23,10 +24,12 @@ import {
 	TableCell,
 	TableRow,
 	Tabs,
+	useTheme,
 } from "@mui/material";
 import { Box } from "@mui/material";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
+import { useRouter } from "next/router";
 interface Post {
 	uid: string;
 	title: string;
@@ -49,6 +52,8 @@ const Home = (props: React.PropsWithChildren) => {
 	// const [posts, setPosts] = useState(postsData.posts);
 	// const axiosClient = useAxiosClient();
 	// // console.log("sdcsfvtet", postsData);
+	const theme = useTheme();
+	const router = useRouter();
 
 	// const deletePostHandler = async (e: any) => {
 	// 	e.preventDefault();
@@ -76,10 +81,91 @@ const Home = (props: React.PropsWithChildren) => {
 						<TableCell sx={{ width: "200px", borderBottom: "0" }}>
 							<Box>
 								<Box>
-									<Link href="/dashboard/posts/">Posts</Link>
+									<Button
+										sx={{
+											color:
+												router.pathname === "/dashboard/posts"
+													? "white"
+													: theme.palette.text1.main,
+											backgroundColor:
+												router.pathname === "/dashboard/posts"
+													? "black"
+													: "white",
+											textTransform: "none",
+											fontSize: 20,
+											width: "100%",
+											marginBottom: "2.5px",
+											fontWeight: 500,
+											borderRadius: 1,
+											border: "1px #272727 solid",
+											"&:hover": {
+												backgroundColor: "#272727",
+												color: "#e9e9e9",
+											},
+										}}
+										href="/dashboard/posts/"
+										LinkComponent={Link}
+									>
+										posts
+									</Button>
 								</Box>
 								<Box>
-									<Link href="/dashboard/categories/">Categories</Link>
+									<Button
+										sx={{
+											color:
+												router.pathname === "/dashboard/categories"
+													? "white"
+													: theme.palette.text1.main,
+											backgroundColor:
+												router.pathname === "/dashboard/categories"
+													? "black"
+													: "white",
+											textTransform: "none",
+											fontSize: 20,
+											width: "100%",
+											marginBottom: "2.5px",
+											fontWeight: 500,
+											borderRadius: 1,
+											border: "1px #272727 solid",
+											"&:hover": {
+												backgroundColor: "#272727",
+												color: "#e9e9e9",
+											},
+										}}
+										href="/dashboard/categories/"
+										LinkComponent={Link}
+									>
+										categories
+									</Button>
+								</Box>
+								<Box>
+									<Button
+										sx={{
+											color:
+												router.pathname === "/dashboard/profile/edit"
+													? "white"
+													: theme.palette.text1.main,
+											backgroundColor:
+												router.pathname === "/dashboard/profile/edit"
+													? "black"
+													: "white",
+											textTransform: "none",
+											fontSize: 20,
+											width: "100%",
+											marginBottom: "2.5px",
+											fontWeight: 500,
+											borderRadius: 1,
+											border: "1px #272727 solid",
+											"&:hover": {
+												backgroundColor: "#272727",
+												color: "#e9e9e9",
+											},
+										}}
+										href="/dashboard/profile/edit/"
+										LinkComponent={Link}
+									>
+										edit profile
+									</Button>
 								</Box>
 							</Box>
 						</TableCell>
