@@ -1,22 +1,149 @@
-import { Typography, Box, Button } from "@mui/material";
+import {
+	Typography,
+	Box,
+	Button,
+	TableContainer,
+	Table,
+	TableHead,
+	TableRow,
+	TableCell,
+	TableBody,
+	TableFooter,
+	TablePagination,
+	Pagination,
+	IconButton,
+	useTheme,
+} from "@mui/material";
+import {
+	KeyboardArrowRight,
+	KeyboardArrowLeft,
+	LastPage,
+	FirstPage,
+} from "@mui/icons-material";
+// import TablePagination from "@material-ui/TablePagination";
+// import TablePaginationActions from "./TablePaginationActions";
+// import TableSortLabel from "@material-ui/core/TableSortLabel";
 import { NextPage } from "next";
 import Link from "next/link";
 import Dashboard from "../../../components/Dashboard";
 import { useState, useEffect, useMemo, useId } from "react";
 import useAxiosClient from "../../../utils/axiosClient";
-import { useTable, TableOptions, Column, Cell } from "react-table";
+import { useTable } from "react-table";
+
+interface TablePaginationActionsProps {
+	count: number;
+	page: number;
+	rowsPerPage: number;
+	onPageChange: (
+		event: React.MouseEvent<HTMLButtonElement>,
+		newPage: number
+	) => void;
+}
+
+function TablePaginationActions(props: TablePaginationActionsProps) {
+	const theme = useTheme();
+	const { count, page, rowsPerPage, onPageChange } = props;
+
+	const handleFirstPageButtonClick = (
+		event: React.MouseEvent<HTMLButtonElement>
+	) => {
+		onPageChange(event, 0);
+	};
+
+	const handleBackButtonClick = (
+		event: React.MouseEvent<HTMLButtonElement>
+	) => {
+		onPageChange(event, page - 1);
+	};
+
+	const handleNextButtonClick = (
+		event: React.MouseEvent<HTMLButtonElement>
+	) => {
+		onPageChange(event, page + 1);
+	};
+
+	const handleLastPageButtonClick = (
+		event: React.MouseEvent<HTMLButtonElement>
+	) => {
+		onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
+	};
+
+	return (
+		<Box sx={{ flexShrink: 0, ml: 2.5 }}>
+			<IconButton
+				onClick={handleFirstPageButtonClick}
+				disabled={page === 0}
+				aria-label="first page"
+			>
+				{theme.direction === "rtl" ? <LastPage /> : <FirstPage />}
+			</IconButton>
+			<IconButton
+				onClick={handleBackButtonClick}
+				disabled={page === 0}
+				aria-label="previous page"
+			>
+				{theme.direction === "rtl" ? (
+					<KeyboardArrowRight />
+				) : (
+					<KeyboardArrowLeft />
+				)}
+			</IconButton>
+			<IconButton
+				onClick={handleNextButtonClick}
+				disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+				aria-label="next page"
+			>
+				{theme.direction === "rtl" ? (
+					<KeyboardArrowLeft />
+				) : (
+					<KeyboardArrowRight />
+				)}
+			</IconButton>
+			<IconButton
+				onClick={handleLastPageButtonClick}
+				disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+				aria-label="last page"
+			>
+				{theme.direction === "rtl" ? <FirstPage /> : <LastPage />}
+			</IconButton>
+		</Box>
+	);
+}
+
 const Posts: NextPage = () => {
 	const [posts, setPosts] = useState([]);
+	const [page, setPage] = useState(0);
+	const [postsCount, setPostsCount] = useState(0);
+	const [rowsPerPage, setRowsPerPage] = useState(5);
 	const axiosClient = useAxiosClient();
 	const getPosts = async () => {
-		const response = await axiosClient.get("http://127.0.0.1:8000/posts/");
+		const response = await axiosClient.get(
+			`http://127.0.0.1:8000/posts/?limit=${rowsPerPage}&offset=${
+				page * rowsPerPage
+			}`
+		);
 		console.log(response);
-		setPosts(response.data);
+		setPosts(response.data.results);
+		setPostsCount(response.data.count);
+	};
+
+	const handleChangePage = (
+		event: React.MouseEvent<HTMLButtonElement> | null,
+		newPage: number
+	) => {
+		setPage(newPage);
+	};
+
+	const handleChangeRowsPerPage = (
+		event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+	) => {
+		setRowsPerPage(parseInt(event.target.value, 10));
+		setPage(0);
 	};
 	const id = useId();
 	useEffect(() => {
 		getPosts();
-	}, []);
+	}, [page, rowsPerPage]);
 
 	interface Cols {
 		title: string;
@@ -104,6 +231,11 @@ const Posts: NextPage = () => {
 								setPosts(
 									posts.filter((post: any) => post.uid !== cell.cell.value)
 								);
+								console.log("sfdegf", posts.length);
+								// won't work on 0
+								if (posts.length == 1) {
+									setPage(page - 1);
+								}
 							}}
 						>
 							Delete
@@ -132,33 +264,33 @@ const Posts: NextPage = () => {
 					add new
 				</Button>
 			</Box>
-			<Box>
-				<table {...getTableProps()}>
-					<thead>
+			<TableContainer>
+				<Table {...getTableProps()}>
+					<TableHead>
 						{
 							// Loop over the header rows
 							headerGroups.map((headerGroup: any) => (
 								// Apply the header row props
 
-								<tr key={id} {...headerGroup.getHeaderGroupProps()}>
+								<TableRow key={id} {...headerGroup.getHeaderGroupProps()}>
 									{
 										// Loop over the headers in each row
 										headerGroup.headers.map((column: any) => (
 											// Apply the header cell props
-											<th key={id} {...column.getHeaderProps()}>
+											<TableCell key={id} {...column.getHeaderProps()}>
 												{
 													// Render the header
 													column.render("Header")
 												}
-											</th>
+											</TableCell>
 										))
 									}
-								</tr>
+								</TableRow>
 							))
 						}
-					</thead>
+					</TableHead>
 					{/* Apply the table body props */}
-					<tbody {...getTableBodyProps()}>
+					<TableBody {...getTableBodyProps()}>
 						{
 							// Loop over the table rows
 							rows.map((row: any) => {
@@ -166,28 +298,48 @@ const Posts: NextPage = () => {
 								prepareRow(row);
 								return (
 									// Apply the row props
-									<tr key={id} {...row.getRowProps()}>
+									<TableRow key={id} {...row.getRowProps()}>
 										{
 											// Loop over the rows cells
 											row.cells.map((cell: any) => {
 												// Apply the cell props
 												return (
-													<td key={id} {...cell.getCellProps()}>
+													<TableCell key={id} {...cell.getCellProps()}>
 														{
 															// Render the cell contents
 															cell.render("Cell")
 														}
-													</td>
+													</TableCell>
 												);
 											})
 										}
-									</tr>
+									</TableRow>
 								);
 							})
 						}
-					</tbody>
-				</table>
-			</Box>
+					</TableBody>
+					<TableFooter>
+						<TableRow>
+							<TablePagination
+								rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
+								colSpan={4}
+								count={postsCount}
+								rowsPerPage={rowsPerPage}
+								page={page}
+								SelectProps={{
+									inputProps: {
+										"aria-label": "rows per page",
+									},
+									native: true,
+								}}
+								onPageChange={handleChangePage}
+								onRowsPerPageChange={handleChangeRowsPerPage}
+								ActionsComponent={TablePaginationActions}
+							/>
+						</TableRow>
+					</TableFooter>
+				</Table>
+			</TableContainer>
 		</Dashboard>
 	);
 };

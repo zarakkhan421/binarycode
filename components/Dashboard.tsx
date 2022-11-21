@@ -12,6 +12,7 @@ import Toolbar from "@mui/material/Toolbar";
 
 import {
 	Button,
+	Typography,
 	Divider,
 	List,
 	ListItem,
@@ -54,6 +55,7 @@ const Home = (props: React.PropsWithChildren) => {
 	// // console.log("sdcsfvtet", postsData);
 	const theme = useTheme();
 	const router = useRouter();
+	const { user } = useContext(userContext);
 
 	// const deletePostHandler = async (e: any) => {
 	// 	e.preventDefault();
@@ -81,6 +83,10 @@ const Home = (props: React.PropsWithChildren) => {
 						<TableCell sx={{ width: "200px", borderBottom: "0" }}>
 							<Box>
 								<Box>
+									<Box>
+										<Typography>{user.email}</Typography>
+										<Typography>{user.role}</Typography>
+									</Box>
 									<Button
 										sx={{
 											color:
@@ -165,6 +171,35 @@ const Home = (props: React.PropsWithChildren) => {
 										LinkComponent={Link}
 									>
 										edit profile
+									</Button>
+								</Box>
+								<Box>
+									<Button
+										sx={{
+											color:
+												router.pathname === "/dashboard/comments"
+													? "white"
+													: theme.palette.text1.main,
+											backgroundColor:
+												router.pathname === "/dashboard/comments"
+													? "black"
+													: "white",
+											textTransform: "none",
+											fontSize: 20,
+											width: "100%",
+											marginBottom: "2.5px",
+											fontWeight: 500,
+											borderRadius: 1,
+											border: "1px #272727 solid",
+											"&:hover": {
+												backgroundColor: "#272727",
+												color: "#e9e9e9",
+											},
+										}}
+										href="/dashboard/comments"
+										LinkComponent={Link}
+									>
+										comments
 									</Button>
 								</Box>
 							</Box>

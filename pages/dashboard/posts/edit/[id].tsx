@@ -12,7 +12,6 @@ import axios from "axios";
 
 const Categories = ({ category, categoryChildren, post }: any) => {
 	let children = null;
-	let checkedCat = false;
 	children = categoryChildren.map((child: any) => {
 		return (
 			<Categories
@@ -37,15 +36,13 @@ const Categories = ({ category, categoryChildren, post }: any) => {
 		<ul style={{ listStyle: "none", paddingInlineStart: 20 }}>
 			<label>
 				<Field
-					// component={Checkbox}
-
+					component={Checkbox}
 					type="checkbox"
 					name="categories"
-					// checked={checkedCat}
 					sx={{
 						padding: 0.5,
 					}}
-					value={`${category.uid}`}
+					value={`${category.uid || ""}`}
 				/>
 				{category.name}
 				{children ? children : null}
@@ -74,9 +71,11 @@ const EditPost: NextPage = () => {
 		setCategories(response.data);
 	};
 	useEffect(() => {
-		getPost();
-		getCategories();
-	}, []);
+		if (query.id) {
+			getPost();
+			getCategories();
+		}
+	}, [query]);
 
 	return (
 		<>
@@ -85,11 +84,11 @@ const EditPost: NextPage = () => {
 				<Formik
 					enableReinitialize
 					initialValues={{
-						title: post.title,
-						content: post.content,
-						status: post.status,
-						excerpt: post.excerpt,
-						categories: post?.category_id?.map((cat: any) => cat.uid),
+						title: post.title || "",
+						content: post.content || "",
+						status: post.status || "",
+						excerpt: post.excerpt || "",
+						categories: post.category_id?.map((cat: any) => cat.uid) || [],
 					}}
 					validationSchema={Yup.object({
 						title: Yup.string().required("please enter a title"),
@@ -127,7 +126,6 @@ const EditPost: NextPage = () => {
 											label="Title"
 											name="title"
 											type="text"
-											InputLabelProps={{ shrink: post.title }}
 										/>
 									</Grid>
 									<Grid item xs={12}>
@@ -136,7 +134,6 @@ const EditPost: NextPage = () => {
 											label="Content"
 											name="content"
 											type="text"
-											InputLabelProps={{ shrink: post.content }}
 										/>
 									</Grid>
 								</Grid>
@@ -155,20 +152,15 @@ const EditPost: NextPage = () => {
 									</Grid>
 									<Grid item xs={12}>
 										<Field
-											// component={Select}
+											component={Select}
 											name="status"
 											label="Choose Status"
 											as={"select"}
 											sx={{ width: 200 }}
-											InputLabelProps={{ shrink: post.status }}
 										>
-											{/* <MenuItem value="published">Published</MenuItem>
+											<MenuItem value="published">Published</MenuItem>
 											<MenuItem value="draft">Draft</MenuItem>
-											<MenuItem value="unpublished">UnPublish</MenuItem> */}
-
-											<option value="published">Published</option>
-											<option value="draft">Draft</option>
-											<option value="unpublished">UnPublish</option>
+											<MenuItem value="unpublished">UnPublish</MenuItem>
 										</Field>
 									</Grid>
 									<Grid item xs={12}>
@@ -177,7 +169,6 @@ const EditPost: NextPage = () => {
 											label="Excerpt"
 											name="excerpt"
 											type="text"
-											InputLabelProps={{ shrink: post.excerpt }}
 										/>
 									</Grid>
 									<Grid item xs={12}>

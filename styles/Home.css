@@ -1,0 +1,24 @@
+#nav-categories-menu {
+	position: absolute;
+}
+#nav-categories-menu:hover {
+	display: block;
+}
+
+.nav-categories-menu ul > ul {
+	display: none;
+}
+.nav-categories-menu ul:hover > ul {
+	display: block;
+}
+
+.categories a {
+	display: none;
+	background-color: aqua;
+}
+.categories:hover a {
+	display: block;
+}
+.categories a:first-child {
+	display: block;
+}

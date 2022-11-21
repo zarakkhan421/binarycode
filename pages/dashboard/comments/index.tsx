@@ -1,9 +1,11 @@
+import axios from "axios";
 import { NextPage } from "next";
+import { useEffect, useState, useMemo, useId } from "react";
 import Dashboard from "../../../components/Dashboard";
 import {
 	Typography,
-	Button,
 	Box,
+	Button,
 	TableContainer,
 	Table,
 	TableHead,
@@ -13,41 +15,44 @@ import {
 	TableFooter,
 } from "@mui/material";
 import Link from "next/link";
-import { useState, useId, useEffect, useMemo } from "react";
-import useAxiosClient from "../../../utils/axiosClient";
 import { useTable } from "react-table";
-
-const Categories: NextPage = () => {
-	const [categories, setCategories] = useState([]);
-	const axiosClient = useAxiosClient();
-	const getPosts = async () => {
-		const response = await axiosClient.get(
-			"http://127.0.0.1:8000/categories/all/"
-		);
+import useAxiosClient from "../../../utils/axiosClient";
+const Comments: NextPage = () => {
+	const [comments, setComments] = useState([]);
+	const getComments = async () => {
+		const response = await axios.get(`http://127.0.0.1:8000/comments/`);
 		console.log(response);
-		setCategories(response.data);
+		setComments(response.data);
 	};
+	const axiosClient = useAxiosClient();
 	const id = useId();
 	useEffect(() => {
-		getPosts();
+		getComments();
 	}, []);
-
 	interface Cols {
-		title: string;
-		status: string;
-		author: string;
+		content: string;
+		// status: string;
+		// author: string;
 	}
 
-	const data = useMemo((): Cols[] => categories, [categories]);
+	const data = useMemo((): Cols[] => comments, [comments]);
 	const columns = useMemo(
 		() => [
-			{ Header: "Name", accessor: "name" },
+			{ Header: "Content", accessor: "content" },
+			{ Header: "Post", accessor: "post_id.title" },
 			{
-				Header: "Parent",
-				accessor: "parent.name",
+				Header: "User",
+				accessor: "user_id",
+				Cell: (cell: any) => {
+					if (!cell.cell.value.name || cell.cell.value.name === " ") {
+						return <>{cell.cell.value.email}</>;
+					} else {
+						return <>{cell.cell.value.name}</>;
+					}
+				},
 			},
 			{
-				Header: "Actions",
+				Header: "Action",
 				accessor: "uid",
 				width: 200,
 				Cell: (cell: any) => (
@@ -59,20 +64,9 @@ const Categories: NextPage = () => {
 								textTransform: "none",
 							}}
 							variant="contained"
-							href={`http://localhost:3000/categories/${cell.cell.value}`}
+							href={`http://localhost:3000/posts/${cell.row.original.post_id.uid}`}
 						>
-							Visit
-						</Button>
-						<Button
-							LinkComponent={Link}
-							size="small"
-							sx={{
-								textTransform: "none",
-							}}
-							variant="contained"
-							href={`http://localhost:3000/dashboard/categories/edit/${cell.cell.value}`}
-						>
-							Edit
+							Visit Post
 						</Button>
 						<Button
 							LinkComponent={Link}
@@ -89,12 +83,12 @@ const Categories: NextPage = () => {
 							onClick={async (e) => {
 								console.log(e, cell.cell.value);
 								const response = await axiosClient.delete(
-									`http://127.0.0.1:8000/categories/${cell.cell.value}`
+									`http://127.0.0.1:8000/comments/${cell.cell.value}`
 								);
 								console.log(response);
-								setCategories(
-									categories.filter(
-										(category: any) => category.uid !== cell.cell.value
+								setComments(
+									comments.filter(
+										(comment: any) => comment.uid !== cell.cell.value
 									)
 								);
 							}}
@@ -105,7 +99,7 @@ const Categories: NextPage = () => {
 				),
 			},
 		],
-		[categories]
+		[comments]
 	);
 	const options: any = {
 		data,
@@ -116,14 +110,7 @@ const Categories: NextPage = () => {
 	return (
 		<Dashboard>
 			<Box>
-				<Typography>categories</Typography>
-				<Button
-					variant="outlined"
-					LinkComponent={Link}
-					href="/dashboard/categories/create/"
-				>
-					add new
-				</Button>
+				<Typography variant="h4">comments</Typography>
 			</Box>
 			<TableContainer>
 				<Table {...getTableProps()}>
@@ -185,4 +172,4 @@ const Categories: NextPage = () => {
 	);
 };
 
-export default Categories;
+export default Comments;

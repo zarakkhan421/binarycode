@@ -1,7 +1,7 @@
 import { NextPage } from "next";
 import Dashboard from "../../../components/Dashboard";
 import { Box, Grid, Button, MenuItem } from "@mui/material";
-import { Field, Form, Formik, FieldArray } from "formik";
+import { Field, Form, Formik } from "formik";
 import { TextField, Select, Checkbox } from "formik-mui";
 import * as Yup from "yup";
 import useAxiosClient from "../../../utils/axiosClient";
@@ -14,14 +14,12 @@ const Categories = ({ category, categoryChildren, i }: any) => {
 	i++;
 	children = categoryChildren.map((child: any) => {
 		return (
-			<>
-				<Categories
-					key={child.uid}
-					category={child}
-					categoryChildren={child.children}
-					i={i}
-				/>
-			</>
+			<Categories
+				key={child.uid}
+				category={child}
+				categoryChildren={child.children}
+				i={i}
+			/>
 		);
 	});
 
@@ -120,14 +118,12 @@ const Create: NextPage = () => {
 									{categories.map((category: any) => {
 										let i = 0;
 										return (
-											<>
-												<Categories
-													key={category.uid}
-													category={category}
-													categoryChildren={category.children}
-													i={i}
-												/>
-											</>
+											<Categories
+												key={category.uid}
+												category={category}
+												categoryChildren={category.children}
+												i={i}
+											/>
 										);
 									})}
 								</Grid>

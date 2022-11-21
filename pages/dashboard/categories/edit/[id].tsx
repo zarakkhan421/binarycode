@@ -38,7 +38,9 @@ const EditCategories: NextPage = () => {
 		console.log("cat", response);
 	};
 	useEffect(() => {
-		getCategory();
+		if (id) getCategory();
+	}, [id]);
+	useEffect(() => {
 		getCategories();
 	}, []);
 	return (
@@ -79,7 +81,6 @@ const EditCategories: NextPage = () => {
 							label="Parent"
 							as="select"
 							sx={{ width: 200 }}
-							InputLabelProps={{ shrink: category.uid }}
 						>
 							{categories.map((category: any) => (
 								<MenuItem key={category.uid} value={category.uid}>

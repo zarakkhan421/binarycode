@@ -70,6 +70,7 @@
 // 	);
 // }
 import "../styles/globals.css";
+import "../styles/Home.css";
 import type { AppProps } from "next/app";
 import {
 	createContext,

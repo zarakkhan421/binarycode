@@ -54,7 +54,7 @@ export default async function handler(
 
 		return res.status(200).json(response.data);
 	} catch (error: any) {
-		console.log(error.response.data);
+		console.log("err refresh", error.response.data);
 		if (error.response.data.code === "token_not_valid") {
 			res.setHeader("Set-Cookie", [
 				serialize("refresh_token", "", {
