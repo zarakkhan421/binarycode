@@ -59,7 +59,7 @@ const Categories: NextPage = () => {
 								textTransform: "none",
 							}}
 							variant="contained"
-							href={`http://localhost:3000/categories/${cell.cell.value}`}
+							href={`http://localhost:3000/category/${cell.cell.value}`}
 						>
 							Visit
 						</Button>

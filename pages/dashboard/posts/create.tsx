@@ -8,6 +8,51 @@ import useAxiosClient from "../../../utils/axiosClient";
 import React, { useContext, useEffect, useState } from "react";
 import { userContext } from "../../_app";
 import axios from "axios";
+// import { Quill } from "quill";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+
+// import "../../../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import { EditorState, convertToRaw } from "draft-js";
+// import { Editor } from "react-draft-wysiwyg";
+// import draftToHtml from "draftjs-to-html";
+// import htmlToDraft from "html-to-draftjs";
+// import dynamic from "next/dynamic";
+// const Editor = dynamic(
+// 	() => import("react-draft-wysiwyg").then((mod) => mod.Editor),
+// 	{ ssr: false }
+// );
+// import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+
+// class EditorConvertToHTML extends React.Component {
+// 	state = {
+// 		editorState: EditorState.createEmpty(),
+// 	};
+
+// 	onEditorStateChange = (editorState: any) => {
+// 		this.setState({
+// 			editorState,
+// 		});
+// 	};
+
+// 	render() {
+// 		const { editorState }: any = this.state;
+// 		return (
+// 			<div>
+// 				<Editor
+// 					editorState={editorState}
+// 					wrapperClassName="demo-wrapper"
+// 					editorClassName="demo-editor"
+// 					onEditorStateChange={this.onEditorStateChange}
+// 				/>
+// 				{/* <textarea
+// 					disabled
+// 					value={draftToHtml(convertToRaw(editorState.getCurrentContent()))}
+// 				/> */}
+// 			</div>
+// 		);
+// 	}
+// }
 
 const Categories = ({ category, categoryChildren, i }: any) => {
 	let children = null;
@@ -42,10 +87,13 @@ const Categories = ({ category, categoryChildren, i }: any) => {
 	);
 };
 
-const Create: NextPage = () => {
+const Create = () => {
 	const axiosClient = useAxiosClient();
 	const { user } = useContext(userContext);
 	const [categories, setCategories] = useState<any>([]);
+	// const [editorState, setEditorState] = useState(EditorState.createEmpty());
+	const [value, setValue] = useState("");
+
 	const getCategories = async () => {
 		const response = await axios.get(`http://127.0.0.1:8000/categories/`);
 		console.log("res", response.data);
@@ -54,8 +102,9 @@ const Create: NextPage = () => {
 	useEffect(() => {
 		getCategories();
 	}, []);
+	// var editor = new Quill("#editor");
 	return (
-		<Dashboard>
+		<>
 			{/* <Box> */}
 			<Formik
 				initialValues={{
@@ -67,7 +116,6 @@ const Create: NextPage = () => {
 				}}
 				validationSchema={Yup.object({
 					title: Yup.string().required("please enter a title"),
-					content: Yup.string().required("enter some content"),
 					status: Yup.string()
 						.required("please choose a status")
 						.oneOf(["published", "draft", "unpublished"]),
@@ -77,7 +125,7 @@ const Create: NextPage = () => {
 						`http://127.0.0.1:8000/posts/create/`,
 						{
 							title: values.title,
-							content: values.content,
+							content: value,
 							status: values.status,
 							excerpt: values.excerpt,
 							user_id: user.user_id,
@@ -103,12 +151,76 @@ const Create: NextPage = () => {
 									/>
 								</Grid>
 								<Grid item xs={12}>
-									<Field
+									{/* <Field
 										component={TextField}
 										label="Content"
 										name="content"
 										type="text"
+									/> */}
+									{/* <EditorConvertToHTML /> */}
+									{/* <Editor
+										editorState={editorState}
+										wrapperClassName="demo-wrapper"
+										editorClassName="demo-editor"
+										toolbarClassName="toolbar-class"
+										onEditorStateChange={(editorState) => {
+											setEditorState(editorState);
+										}}
+										toolbar={{
+											options: [
+												"inline",
+												"blockType",
+												"fontSize",
+												"fontFamily",
+												"list",
+												"textAlign",
+												"colorPicker",
+												"link",
+												"embedded",
+												"emoji",
+												"image",
+												"history",
+											],
+											inline: { inDropdown: true },
+											list: { inDropdown: true },
+											textAlign: { inDropdown: true },
+											link: { inDropdown: true },
+											history: { inDropdown: true },
+										}}
+									/> */}
+									<ReactQuill
+										theme="snow"
+										value={value}
+										onChange={setValue}
+										modules={{
+											toolbar: [
+												[{ header: [1, 2, false] }],
+												["bold", "italic", "underline", "strike", "blockquote"],
+												[
+													{ list: "ordered" },
+													{ list: "bullet" },
+													{ indent: "-1" },
+													{ indent: "+1" },
+												],
+												["link", "image"],
+												["clean"],
+											],
+										}}
+										formats={[
+											"header",
+											"bold",
+											"italic",
+											"underline",
+											"strike",
+											"blockquote",
+											"list",
+											"bullet",
+											"indent",
+											"link",
+											"image",
+										]}
 									/>
+									<textarea disabled value={value} />
 								</Grid>
 							</Grid>
 						</Grid>
@@ -159,7 +271,7 @@ const Create: NextPage = () => {
 				</Form>
 			</Formik>
 			{/* </Box> */}
-		</Dashboard>
+		</>
 	);
 };
 export default Create;

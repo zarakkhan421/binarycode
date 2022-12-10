@@ -282,7 +282,9 @@ const Post: NextPage<{ post: any; serverComments: any }> = ({
 			</Box>
 			<Grid container>
 				<Grid item xs={10}>
-					<Box>{post.content}</Box>
+					<Box>
+						<td dangerouslySetInnerHTML={{ __html: post.content }} />
+					</Box>
 					<Box>
 						<Formik
 							initialValues={{ content: "" }}
