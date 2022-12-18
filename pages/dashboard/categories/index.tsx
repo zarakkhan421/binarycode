@@ -11,26 +11,134 @@ import {
 	TableCell,
 	TableBody,
 	TableFooter,
+	IconButton,
+	useTheme,
+	TablePagination,
+	Grid,
 } from "@mui/material";
+import {
+	KeyboardArrowRight,
+	KeyboardArrowLeft,
+	LastPage,
+	FirstPage,
+} from "@mui/icons-material";
 import Link from "next/link";
 import { useState, useId, useEffect, useMemo } from "react";
 import useAxiosClient from "../../../utils/axiosClient";
 import { useTable } from "react-table";
+interface TablePaginationActionsProps {
+	count: number;
+	page: number;
+	rowsPerPage: number;
+	onPageChange: (
+		event: React.MouseEvent<HTMLButtonElement>,
+		newPage: number
+	) => void;
+}
 
+function TablePaginationActions(props: TablePaginationActionsProps) {
+	const theme = useTheme();
+	const { count, page, rowsPerPage, onPageChange } = props;
+
+	const handleFirstPageButtonClick = (
+		event: React.MouseEvent<HTMLButtonElement>
+	) => {
+		onPageChange(event, 0);
+	};
+
+	const handleBackButtonClick = (
+		event: React.MouseEvent<HTMLButtonElement>
+	) => {
+		onPageChange(event, page - 1);
+	};
+
+	const handleNextButtonClick = (
+		event: React.MouseEvent<HTMLButtonElement>
+	) => {
+		onPageChange(event, page + 1);
+	};
+
+	const handleLastPageButtonClick = (
+		event: React.MouseEvent<HTMLButtonElement>
+	) => {
+		onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
+	};
+
+	return (
+		<Box sx={{ flexShrink: 0, ml: 2.5 }}>
+			<IconButton
+				onClick={handleFirstPageButtonClick}
+				disabled={page === 0}
+				aria-label="first page"
+			>
+				{theme.direction === "rtl" ? <LastPage /> : <FirstPage />}
+			</IconButton>
+			<IconButton
+				onClick={handleBackButtonClick}
+				disabled={page === 0}
+				aria-label="previous page"
+			>
+				{theme.direction === "rtl" ? (
+					<KeyboardArrowRight />
+				) : (
+					<KeyboardArrowLeft />
+				)}
+			</IconButton>
+			<IconButton
+				onClick={handleNextButtonClick}
+				disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+				aria-label="next page"
+			>
+				{theme.direction === "rtl" ? (
+					<KeyboardArrowLeft />
+				) : (
+					<KeyboardArrowRight />
+				)}
+			</IconButton>
+			<IconButton
+				onClick={handleLastPageButtonClick}
+				disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+				aria-label="last page"
+			>
+				{theme.direction === "rtl" ? <FirstPage /> : <LastPage />}
+			</IconButton>
+		</Box>
+	);
+}
 const Categories: NextPage = () => {
 	const [categories, setCategories] = useState([]);
 	const axiosClient = useAxiosClient();
+	const [page, setPage] = useState(0);
+	const [postsCount, setPostsCount] = useState(0);
+	const [rowsPerPage, setRowsPerPage] = useState(5);
 	const getPosts = async () => {
 		const response = await axiosClient.get(
-			"http://127.0.0.1:8000/categories/all/"
+			`http://127.0.0.1:8000/categories/all/?limit=${rowsPerPage}&offset=${
+				page * rowsPerPage
+			}`
 		);
 		console.log(response);
-		setCategories(response.data);
+		setCategories(response.data.results);
+		setPostsCount(response.data.count);
 	};
+	const handleChangePage = (
+		event: React.MouseEvent<HTMLButtonElement> | null,
+		newPage: number
+	) => {
+		setPage(newPage);
+	};
+
+	const handleChangeRowsPerPage = (
+		event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+	) => {
+		setRowsPerPage(parseInt(event.target.value, 10));
+		setPage(0);
+	};
+
 	const id = useId();
 	useEffect(() => {
 		getPosts();
-	}, []);
+	}, [page, rowsPerPage]);
 
 	interface Cols {
 		title: string;
@@ -115,16 +223,28 @@ const Categories: NextPage = () => {
 		useTable(options);
 	return (
 		<Dashboard>
-			<Box>
-				<Typography>categories</Typography>
-				<Button
-					variant="outlined"
-					LinkComponent={Link}
-					href="/dashboard/categories/create/"
-				>
-					add new
-				</Button>
-			</Box>
+			<Grid container sx={{ display: "flex", alignItems: "center" }}>
+				<Grid item>
+					<Typography
+						variant="h4"
+						sx={{
+							paddingLeft: 2,
+							marginRight: 2,
+						}}
+					>
+						categories
+					</Typography>
+				</Grid>
+				<Grid item>
+					<Button
+						variant="outlined"
+						LinkComponent={Link}
+						href="/dashboard/categories/create/"
+					>
+						add new
+					</Button>
+				</Grid>
+			</Grid>
 			<TableContainer>
 				<Table {...getTableProps()}>
 					<TableHead>
@@ -179,6 +299,31 @@ const Categories: NextPage = () => {
 							})
 						}
 					</TableBody>
+					<TableFooter>
+						<TableRow>
+							<TablePagination
+								rowsPerPageOptions={[
+									5,
+									10,
+									25,
+									{ label: "All", value: postsCount },
+								]}
+								colSpan={4}
+								count={postsCount}
+								rowsPerPage={rowsPerPage}
+								page={page}
+								SelectProps={{
+									inputProps: {
+										"aria-label": "rows per page",
+									},
+									native: true,
+								}}
+								onPageChange={handleChangePage}
+								onRowsPerPageChange={handleChangeRowsPerPage}
+								ActionsComponent={TablePaginationActions}
+							/>
+						</TableRow>
+					</TableFooter>
 				</Table>
 			</TableContainer>
 		</Dashboard>

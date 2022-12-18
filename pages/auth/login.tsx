@@ -1,6 +1,5 @@
 import { NextPage } from "next";
 import { useState, SyntheticEvent } from "react";
-import Router from "next/router";
 import axios from "axios";
 import { useContext } from "react";
 import { userContext } from "../_app";
@@ -10,11 +9,11 @@ import * as Yup from "yup";
 import { TextField } from "formik-mui";
 import { Box, Button, Grid, Typography, useTheme } from "@mui/material";
 import useAxiosClient from "../../utils/axiosClient";
-
+import { useRouter } from "next/router";
 const Login: NextPage = () => {
 	const { setUser } = useContext(userContext);
 	const theme = useTheme();
-
+	const router = useRouter();
 	return (
 		<div>
 			<Formik
@@ -45,9 +44,10 @@ const Login: NextPage = () => {
 						access: user.data.user.token.access,
 						refresh: user.data.user.token.refresh,
 						user_id: user.data.user.user_id,
+						isLoggedin: true,
 					});
 					console.log(user);
-
+					router.push("/");
 					setSubmitting(false);
 				}}
 			>
@@ -70,8 +70,6 @@ const Login: NextPage = () => {
 								sx={{ width: "300px" }}
 							/>
 						</Grid>
-						{/* <ErrorMessage name="email" /> */}
-						{/* <label htmlFor="password">Password</label> */}
 						<Grid item xs={6}>
 							<Field
 								label={"Password"}
@@ -82,7 +80,6 @@ const Login: NextPage = () => {
 								sx={{ width: "300px" }}
 							/>
 						</Grid>
-						{/* <ErrorMessage name="password" /> */}
 						<Grid item xs={12}>
 							<Button
 								variant="contained"

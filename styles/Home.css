@@ -8,16 +8,24 @@
 .nav-categories-menu ul > ul {
 	display: none;
 }
+.nav-categories-menu ul > ul li:hover {
+	background-color: #cccccc;
+	transition: all 0.5s;
+}
 .nav-categories-menu ul:hover > ul {
 	display: block;
 }
 
+.categories {
+	z-index: 10;
+}
 .categories a {
 	display: none;
-	background-color: aqua;
+	padding: 1px 2px;
 }
 .categories:hover a {
 	display: block;
+	background-color: #e6e6e6;
 }
 .categories a:first-child {
 	display: block;

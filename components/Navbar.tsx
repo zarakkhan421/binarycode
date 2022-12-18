@@ -4,14 +4,11 @@ import { AppBar, Button, Grid, Toolbar, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import SearchIcon from "@mui/icons-material/Search";
 import LockPersonIcon from "@mui/icons-material/LockPerson";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { userContext } from "../pages/_app";
 import axios from "axios";
 import { Box } from "@mui/system";
-
-const NavLinks = [
-	{ href: "/", name: "home" },
-	{ href: "/dashboard", name: "dashboard" },
-];
+import { useRouter } from "next/router";
 
 const Categories = ({ category, categoryChildren, i }: any) => {
 	let children = null;
@@ -34,22 +31,31 @@ const Categories = ({ category, categoryChildren, i }: any) => {
 				style={{
 					listStyle: "none",
 					paddingInlineStart: 20,
-					backgroundColor: "red",
+					// backgroundColor: "red",
 				}}
 			>
 				<li
-					style={{
-						color: "black",
-						display: "block",
-						backgroundColor: "yellow",
-					}}
+					style={
+						{
+							// color: "black",
+							// display: "block",
+							// backgroundColor: "yellow",
+						}
+					}
 					onClick={() => {
 						let el: any = document.getElementById("nav-categories-menu");
 						el.style.display = "none";
 					}}
 					id={`children-tree-${category.tree_id}-level-${category.level}`}
 				>
-					<Link href={`http://localhost:3000/category/${category.uid}`}>
+					<Link
+						style={{
+							textDecoration: "none",
+							fontWeight: 500,
+							color: theme.palette.text1.main,
+						}}
+						href={`http://localhost:3000/category/${category.uid}`}
+					>
 						{category.name}
 					</Link>
 				</li>
@@ -61,6 +67,8 @@ const Categories = ({ category, categoryChildren, i }: any) => {
 const Navbar = () => {
 	const theme: any = useTheme();
 	// console.log(theme);
+	const router = useRouter();
+	const { user, setUser } = useContext(userContext);
 	const [categories, setCategories] = useState([]);
 	const getCategories = async () => {
 		const response = await axios.get(`http://127.0.0.1:8000/categories/`);
@@ -87,7 +95,7 @@ const Navbar = () => {
 									sx={{
 										color: theme.palette.text1.main,
 										textTransform: "lowercase",
-										fontSize: 18,
+										fontSize: 22,
 									}}
 								>
 									codeblock.
@@ -100,7 +108,8 @@ const Navbar = () => {
 									sx={{
 										color: theme.palette.text1.main,
 										textTransform: "lowercase",
-										fontSize: 18,
+										fontSize: 22,
+										marginRight: 2,
 										fontWeight: theme.typography.fontWeightRegular,
 									}}
 									onClick={() => {
@@ -117,8 +126,9 @@ const Navbar = () => {
 									sx={{
 										display: "none",
 										position: "relative",
-										backgroundColor: "orange",
+										backgroundColor: "#e6e6e6",
 										width: 200,
+										borderRadius: 2,
 									}}
 									id="nav-categories-menu"
 									className="nav-categories-menu"
@@ -136,39 +146,27 @@ const Navbar = () => {
 									})}
 								</Box>
 							</Grid>
-							{/* <Grid item>
-								<Link href={"/dashboard"}>dashboard</Link>
-							</Grid> */}
 							<Grid item>
-								{/* <Button
-									style={{
-										color: theme.palette.text1.main,
-										textTransform: "lowercase",
-										fontSize: 18,
-										fontWeight: theme.typography.fontWeightRegular,
-									}}
-									LinkComponent={Link}
-									href={"/"}
-								>
-									home
-								</Button> */}
+								{user.isLoggedin && (
+									<Button
+										style={{
+											color: theme.palette.text1.main,
+											textTransform: "lowercase",
+											fontSize: 22,
+											marginRight: 2,
+											fontWeight: theme.typography.fontWeightRegular,
+										}}
+										LinkComponent={Link}
+										href={"/dashboard"}
+									>
+										dashboard
+									</Button>
+								)}
 								<Button
 									style={{
 										color: theme.palette.text1.main,
 										textTransform: "lowercase",
-										fontSize: 18,
-										fontWeight: theme.typography.fontWeightRegular,
-									}}
-									LinkComponent={Link}
-									href={"/dashboard"}
-								>
-									dashboard
-								</Button>
-								<Button
-									style={{
-										color: theme.palette.text1.main,
-										textTransform: "lowercase",
-										fontSize: 18,
+										fontSize: 22,
 										fontWeight: theme.typography.fontWeightRegular,
 									}}
 									LinkComponent={Link}
@@ -181,19 +179,47 @@ const Navbar = () => {
 							))
 						</Grid>
 						<Grid>
-							<Button
-								style={{
-									color: theme.palette.text1.main,
-									textTransform: "lowercase",
-									fontSize: 18,
-									fontWeight: theme.typography.fontWeightRegular,
-								}}
-								LinkComponent={Link}
-								href={"/auth/login"}
-								startIcon={<LockPersonIcon />}
-							>
-								authenticate
-							</Button>
+							{!user.isLoggedin ? (
+								<Button
+									style={{
+										color: theme.palette.text1.main,
+										textTransform: "lowercase",
+										fontSize: 22,
+										fontWeight: theme.typography.fontWeightRegular,
+									}}
+									LinkComponent={Link}
+									href={"/auth/login"}
+									startIcon={<LockPersonIcon />}
+								>
+									authenticate
+								</Button>
+							) : (
+								<Button
+									style={{
+										color: theme.palette.text1.main,
+										textTransform: "lowercase",
+										fontSize: 22,
+										fontWeight: theme.typography.fontWeightRegular,
+									}}
+									LinkComponent={Link}
+									// href={"/api/logout"}
+									onClick={() => {
+										console.log("logout");
+										router.push("/api/logout");
+										setUser({
+											email: "",
+											role: "",
+											access: "",
+											refresh: "",
+											user_id: "",
+											isLoggedin: false,
+										});
+									}}
+									startIcon={<LockPersonIcon />}
+								>
+									logout
+								</Button>
+							)}
 						</Grid>
 					</Toolbar>
 				</AppBar>

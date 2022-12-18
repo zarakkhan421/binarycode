@@ -13,6 +13,7 @@ import {
 	Pagination,
 	IconButton,
 	useTheme,
+	Grid,
 } from "@mui/material";
 import {
 	KeyboardArrowRight,
@@ -140,6 +141,7 @@ const Posts: NextPage = () => {
 		setRowsPerPage(parseInt(event.target.value, 10));
 		setPage(0);
 	};
+
 	const id = useId();
 	useEffect(() => {
 		getPosts();
@@ -254,16 +256,28 @@ const Posts: NextPage = () => {
 		useTable(options);
 	return (
 		<Dashboard>
-			<Box>
-				<Typography>posts</Typography>
-				<Button
-					variant="outlined"
-					LinkComponent={Link}
-					href="/dashboard/posts/create/"
-				>
-					add new
-				</Button>
-			</Box>
+			<Grid container sx={{ display: "flex", alignItems: "center" }}>
+				<Grid item>
+					<Typography
+						variant="h4"
+						sx={{
+							paddingLeft: 2,
+							marginRight: 2,
+						}}
+					>
+						posts
+					</Typography>
+				</Grid>
+				<Grid item>
+					<Button
+						variant="outlined"
+						LinkComponent={Link}
+						href="/dashboard/posts/create/"
+					>
+						add new
+					</Button>
+				</Grid>
+			</Grid>
 			<TableContainer>
 				<Table {...getTableProps()}>
 					<TableHead>

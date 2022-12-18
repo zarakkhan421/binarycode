@@ -25,7 +25,9 @@ export default async function handler(
 					path: "/",
 				}),
 			]);
-			return res.status(200).json({ success: false, message: "not logged in" });
+			return res
+				.status(200)
+				.json({ success: false, message: "not logged in " });
 		}
 		const response = await axios.post(
 			"http://127.0.0.1:8000/api/token/refresh/",
@@ -72,7 +74,7 @@ export default async function handler(
 					path: "/",
 				}),
 			]);
-			res.status(200).json({ success: false, message: "message not valid" });
+			res.status(200).json({ success: false, message: " not valid" });
 		}
 	}
 }

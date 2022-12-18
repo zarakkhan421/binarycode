@@ -24,15 +24,6 @@ const Categories = ({ category, categoryChildren, post }: any) => {
 			/>
 		);
 	});
-	// console.log("post selected cats", post?.category_id);
-	// console.log("category", category);
-	// let selected = post?.category_id.map(
-	// 	(selectedCategory: any) => selectedCategory.uid
-	// );
-	// console.log("selected", selected);
-
-	// checkedCat = selected.includes(category.uid);
-	// console.log("checked", checkedCat);
 
 	return (
 		<ul style={{ listStyle: "none", paddingInlineStart: 20 }}>
@@ -65,7 +56,7 @@ const EditPost: NextPage = () => {
 	const getPost = async () => {
 		const response = await axiosClient.get(`http://127.0.0.1:8000/posts/${id}`);
 		setPost(response.data);
-		setValue(post.content);
+		setValue(response.data.content);
 		console.log("edit post", post);
 	};
 	const getCategories = async () => {
@@ -87,7 +78,7 @@ const EditPost: NextPage = () => {
 				enableReinitialize
 				initialValues={{
 					title: post.title || "",
-					content: post.content || "",
+					content: value,
 					status: post.status || "",
 					excerpt: post.excerpt || "",
 					categories: post.category_id?.map((cat: any) => cat.uid) || [],
@@ -106,7 +97,7 @@ const EditPost: NextPage = () => {
 						`http://127.0.0.1:8000/posts/${id}/`,
 						{
 							title: values.title,
-							content: values.content,
+							content: value,
 							status: values.status,
 							excerpt: values.excerpt,
 							user_id: user.user_id,
@@ -131,12 +122,6 @@ const EditPost: NextPage = () => {
 									/>
 								</Grid>
 								<Grid item xs={12}>
-									{/* <Field
-											component={TextField}
-											label="Content"
-											name="content"
-											type="text"
-										/> */}
 									<ReactQuill
 										theme="snow"
 										value={value}

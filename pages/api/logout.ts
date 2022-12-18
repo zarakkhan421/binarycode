@@ -7,7 +7,6 @@ export default async function handler(
 	res: NextApiResponse
 ) {
 	console.log(req.cookies);
-
 	let user = await axios.post(
 		"http://127.0.0.1:8000/api/auth/logout/",
 		{},
@@ -38,5 +37,7 @@ export default async function handler(
 			path: "/",
 		}),
 	]);
-	res.status(200).json({ success: true });
+
+	// res.redirect("/");
+	// res.status(200).json({ success: true });
 }

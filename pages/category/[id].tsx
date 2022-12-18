@@ -1,3 +1,4 @@
+import { Grid } from "@mui/material";
 import axios from "axios";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
@@ -21,7 +22,14 @@ const CategoryPage = () => {
 	}, [query]);
 	return (
 		<>
-			<Post posts={posts} />
+			<Grid container spacing={2}>
+				{posts.map((post: any) => (
+					<Grid item xs={6} md={3} key={post.uid}>
+						<Post post={post} />
+					</Grid>
+				))}
+			</Grid>
+			{/* <Post posts={posts} /> */}
 		</>
 	);
 };
